@@ -1,0 +1,4 @@
+data/audios
+data/mfcc.pkl
+data/lfcc.pkl
+data/chroma.pkl

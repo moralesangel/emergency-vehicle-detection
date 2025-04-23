@@ -1,0 +1,4 @@
+data/chroma.pkl filter=lfs diff=lfs merge=lfs -text
+data/lfcc.pkl filter=lfs diff=lfs merge=lfs -text
+data/mfcc.pkl filter=lfs diff=lfs merge=lfs -text
+data/csv_files/unbalanced_train_segments.csv filter=lfs diff=lfs merge=lfs -text

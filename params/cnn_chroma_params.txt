@@ -1,0 +1,63 @@
+ID: 20250402184529
+Porcentaje: 0.5
+Parámetros: (16, 0.1, 'relu')
+Tiempo medio: 00:02:02
+Accuracy medio: 0.9592
+Loss medio: 0.1037
+
+ID: 20250402185541
+Porcentaje: 0.5
+Parámetros: (16, 0.2, 'relu')
+Tiempo medio: 00:01:59
+Accuracy medio: 0.9414
+Loss medio: 0.1377
+
+ID: 20250402190557
+Porcentaje: 0.5
+Parámetros: (16, 0.3, 'relu')
+Tiempo medio: 00:02:00
+Accuracy medio: 0.9182
+Loss medio: 0.1749
+
+ID: 20250402191656
+Porcentaje: 0.5
+Parámetros: (32, 0.1, 'relu')
+Tiempo medio: 00:02:07
+Accuracy medio: 0.9559
+Loss medio: 0.1155
+
+ID: 20250402192829
+Porcentaje: 0.5
+Parámetros: (32, 0.2, 'relu')
+Tiempo medio: 00:02:15
+Accuracy medio: 0.9445
+Loss medio: 0.1424
+
+ID: 20250402193920
+Porcentaje: 0.5
+Parámetros: (32, 0.3, 'relu')
+Tiempo medio: 00:02:05
+Accuracy medio: 0.9086
+Loss medio: 0.2164
+
+ID: 20250402195010
+Porcentaje: 0.5
+Parámetros: (64, 0.1, 'relu')
+Tiempo medio: 00:02:05
+Accuracy medio: 0.9531
+Loss medio: 0.1148
+
+ID: 20250402200619
+Porcentaje: 0.5
+Parámetros: (64, 0.2, 'relu')
+Tiempo medio: 00:03:08
+Accuracy medio: 0.9368
+Loss medio: 0.1415
+
+ID: 20250402201941
+Porcentaje: 0.5
+Parámetros: (64, 0.3, 'relu')
+Tiempo medio: 00:02:35
+Accuracy medio: 0.8936
+Loss medio: 0.2554
+

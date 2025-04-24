@@ -91,7 +91,7 @@ Este repositorio contiene el proyecto de fin de grado centrado en la detección 
 
 3. **Evaluación y métricas**:
    ```bash
-   python src/model_training/evaluate.py
+   python src/evaluation.ipynb
    ```
 
 ---

@@ -1,1 +1,3 @@
 data/audios
+__pycache__/
+plots/

@@ -86,13 +86,21 @@ Este repositorio contiene el proyecto de fin de grado centrado en la detección 
     
    Los autoencoders se pueden entrenar en: src/model/training/autoencoders
 
+   Se deberá seleccionar la técnica deseada en la parte superior del archivo.
+
+
    Los modelos de clasificación se pueden entrenar en: src/model/training/models
+
+   Se deberá seleccionar la arquitectura y técnica deseada en la parte superior del archivo.
 
 
 3. **Evaluación y métricas**:
+
    ```bash
    python src/evaluation.ipynb
    ```
+   
+   Se deberá seleccionar la arquitectura y técnica deseada en la parte superior del archivo.
 
 ---
 

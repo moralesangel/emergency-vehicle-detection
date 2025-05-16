@@ -54,7 +54,20 @@ Este repositorio contiene el proyecto de fin de grado centrado en la detección 
 
 ---
 
-## 🚀 Uso
+## 🦜Uso de la demostración
+1. **Lanzar backend**
+   ```bash
+   cd backend
+   python api.py
+   ```
+2. **Lanzar frontend**
+   ```bash
+   cd frontend
+   netlify dev
+   ```
+
+
+## 🚀 Datos ténicos
 1. **Descarga y preprocesado de datos**:
    Los audios ya han sido descargados y procesados. Se muestra el código relevante en:
       - src/download_data/dpa.ipynb

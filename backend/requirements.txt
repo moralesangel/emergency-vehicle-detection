@@ -1,0 +1,8 @@
+Flask
+flask-socketio
+eventlet             # servidor asíncrono
+sounddevice
+numpy
+librosa
+keras
+scikit-learn

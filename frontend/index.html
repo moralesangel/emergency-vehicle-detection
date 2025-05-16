@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Detector Audio</title>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center p-4">
+  <h1 class="text-3xl font-bold mb-4">Detección en Tiempo Real</h1>
+  <canvas id="probChart" class="w-full max-w-3xl h-64 mb-6"></canvas>
+  <div id="status" class="text-lg"></div>
+
+  <script>
+    // 1. Conexión WebSocket
+    const socket = io("http://localhost:5000", {
+        transports: ["websocket"],
+        secure: false
+    });
+
+    socket.on("connected", d => {
+      document.getElementById("status").textContent = d.msg;
+    });
+
+    // 2. Inicialización de Chart.js
+    const ctx = document.getElementById('probChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array(20).fill(''), // placeholder
+        datasets: [{
+          label: 'Probabilidad',
+          data: Array(20).fill(0),
+          tension: 0.4,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        scales: { y: { min: 0, max: 1 } },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // 3. Al recibir predicción
+    socket.on("prediction", d => {
+      chart.data.labels.push(d.ts);
+      chart.data.labels.shift();
+      chart.data.datasets[0].data.push(d.prob);
+      chart.data.datasets[0].data.shift();
+      chart.update();
+    });
+  </script>
+</body>
+</html>

@@ -1,10 +1,10 @@
-# 🏷️ TFG: Detección de Vehículos de Emergencia con Deep Learning 🚨
+# 🏷️ Final Degree Project: Emergency Vehicle Detection with Deep Learning 🚨
 
-Este repositorio contiene el proyecto de fin de grado centrado en la detección automática de vehículos de emergencia a partir de señales de audio, usando redes neuronales en Python.
+This repository contains the Final Degree Project focused on automatic detection of emergency vehicles from audio signals using deep neural networks in Python.
 
 ---
 
-## 📂 Estructura del proyecto
+## 📂 Project Structure
 ```
 ├─── data # Datos con los que entrenar los modelos
 │    ├─── csv_files  # Etiquetas en CSV
@@ -42,46 +42,46 @@ Este repositorio contiene el proyecto de fin de grado centrado en la detección 
                ├─── autoencoders.ipynb
                └─── models.ipynb
 ```
-
 ---
 
-## 🛠️ Requisitos
-- Python ≥ 3.11
-- Instalar dependencias:
+## 🛠️ Requirements
+
+- Python ≥ 3.11  
+- Install dependencies:
   ```bash
   pip install -r requirements.txt
   ```
 
 ---
 
-## 🦜Uso de la demostración
-1. **Lanzar backend**
+## 🦜Demostration usage
+1. **Run backend**
    ```bash
    cd backend
    python api.py
    ```
-2. **Lanzar frontend**
+2. **Run frontend**
    ```bash
    cd frontend
    netlify dev
    ```
 
 
-## 🚀 Datos ténicos
-1. **Descarga y preprocesado de datos**:
-   Los audios ya han sido descargados y procesados. Se muestra el código relevante en:
-      - src/download_data/dpa.ipynb
-      - src/download_data/dna.ipynb
+## 🚀 Technical details
+1. **Data Download & Preprocessing**:
+   Audio files have already been downloaded and preprocessed. Relevant code can be found in:
+      - `src/download_data/dpa.ipynb`
+      - `src/download_data/dna.ipynb`
 
-   Para los positivos y negativos respectivamente. 
+   For positive and negative audio files respectively. 
    
-   Se deberá trabajar con las características ya extraídas por los archivos en src/feature_extraction/.
-   Y que se encuentran almacenadas en:
+   You should work with features extracted from: `src/feature_extraction`.
+   They are stored in:
       - data/mfcc.pkl
       - data/lfcc.pkl
       - data/chroma.pkl
 
-   El formato es el siguiente para los tres casos:
+   Format for all three cases:
    ```python
    feature = {
       'positive': [],
@@ -91,30 +91,25 @@ Este repositorio contiene el proyecto de fin de grado centrado en la detección 
    }
    ```
 
-   Donde en 'positive' se encuentran los valores de cada muestra positiva y en su mismo índice en 'pnames', el nombre del archivo .wav. Exactamente igual para los datos negativos con 'negative' y 'nnames'.
+   In `positive`, values for positive data is stored, while in `pnames` their .wav names are stored (same index). Same thing for  `negative` and `nnames`.
 
-   Un estudio detallado del conjunto de datos se encuentra en: src/eda.ipynb
+   A detailed exploratory data analysis is available in: `src/eda.ipynb`.
 
-2. **Entrenamiento del modelo**:
+2. **Model training**:
     
-   Los autoencoders se pueden entrenar en: src/model/training/autoencoders
+     Autoencoders can be trained in `src/model/training/autoencoders`.  
+     You should select the desired technique at the top of the file.
 
-   Se deberá seleccionar la técnica deseada en la parte superior del archivo.
+     Classification models can be trained in `src/model/training/models`.  
+     You should choose the architecture and technique you wish to use at the top of the file.
 
-
-   Los modelos de clasificación se pueden entrenar en: src/model/training/models
-
-   Se deberá seleccionar la arquitectura y técnica deseada en la parte superior del archivo.
-
-
-3. **Evaluación y métricas**:
-
+3. **Evaluation & Metrics**:
    ```bash
    python src/evaluation.ipynb
    ```
    
-   Se deberá seleccionar la arquitectura y técnica deseada en la parte superior del archivo.
+   You should choose the architecture and technique you wish to use at the top of the file.
 
 ---
 
-*Ángel Morales* – Estudiante de Ingeniería Informática - Universidad de Cádiz
+*Ángel Morales* – Computer Engineering student - University of Cadiz

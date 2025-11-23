@@ -1,4 +1,4 @@
-# 🏷️ Final Degree Project: Emergency Vehicle Detection with Deep Learning 🚨
+# 🏷️ BS Thesis: Emergency Vehicle Detection with Deep Learning 🚨
 
 This repository contains the Final Degree Project focused on automatic detection of emergency vehicles from audio signals using deep neural networks in Python.
 

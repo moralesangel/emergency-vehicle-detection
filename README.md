@@ -1,6 +1,7 @@
 # 🏷️ BS Thesis: Emergency Vehicle Detection with Deep Learning 🚨
 
 This repository contains the BS Thesis focused on automatic detection of emergency vehicles from audio signals using deep neural networks in Python.
+Link to paper: [![ResearchGate](https://img.shields.io/badge/ResearchGate-Read_Paper-00CCBB?style=flat&logo=researchgate&logoColor=white)](https://www.researchgate.net/publication/397316148_Neural_Audio_Classification_for_Emergency_Vehicle_Detection_with_Feature_Compression_via_Convolutional_Autoencoders)
 
 ---
 

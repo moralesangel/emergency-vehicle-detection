@@ -2,6 +2,9 @@
 
 This repository contains the BS Thesis focused on automatic detection of emergency vehicles from audio signals using deep neural networks in Python.
 
+**[▶ Try the live demo](https://moralesangel.github.io/emergency-vehicle-detection/)** — the
+trained chroma CNN running in your browser, on your microphone or a synthetic siren.
+
 📋 **Link to paper:** [![ResearchGate](https://img.shields.io/badge/ResearchGate-Read_Paper-00CCBB?style=flat&logo=researchgate&logoColor=white)](https://www.researchgate.net/publication/397316148_Neural_Audio_Classification_for_Emergency_Vehicle_Detection_with_Feature_Compression_via_Convolutional_Autoencoders)
 
 ---

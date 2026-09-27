@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emergency Vehicle Detection — live demo</title>
+<meta name="description" content="A convolutional autoencoder and CNN trained on AudioSet, detecting emergency sirens from audio live in your browser.">
+<style>
+  :root {
+    --bg:#0f1115; --panel:#171a21; --line:#262b36;
+    --text:#e7ebf3; --muted:#9aa4b8;
+    --accent:#e8623c; --accent-dim:#c14a28;
+    --quiet:#5b6577; --alert:#ff6b4a; --ok:#7ee0a0;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg:#f6f7f9; --panel:#fff; --line:#e2e6ee;
+      --text:#12151b; --muted:#5a6478;
+      --accent:#c1441f; --accent-dim:#9c3417;
+      --quiet:#8792a6; --alert:#d6421d; --ok:#1f7a45;
+    }
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--bg); color:var(--text);
+    font:15px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    padding:32px 16px 64px;
+  }
+  .wrap { max-width:880px; margin:0 auto; }
+  header { text-align:center; margin-bottom:24px; }
+  h1 { font-size:1.6rem; margin:0 0 6px; letter-spacing:-.02em; }
+  .sub { color:var(--muted); margin:0; }
+  .sub a { color:var(--accent); }
+  h2 { font-size:1rem; margin:0 0 12px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:16px; }
+
+  .controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  button {
+    font:inherit; font-weight:500; cursor:pointer; padding:9px 16px; border-radius:8px;
+    background:var(--accent); color:#fff; border:1px solid transparent;
+  }
+  button:hover:not(:disabled) { background:var(--accent-dim); }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  button.ghost { background:transparent; color:var(--text); border-color:var(--line); }
+  button.ghost:hover:not(:disabled) { border-color:var(--accent); color:var(--accent); }
+
+  .verdict {
+    display:flex; align-items:center; gap:14px;
+    padding:16px; border-radius:10px; margin-top:14px;
+    background:var(--bg); border:1px solid var(--line);
+  }
+  .lamp { width:40px; height:40px; border-radius:50%; background:var(--quiet); flex:none; transition:background .2s, box-shadow .2s; }
+  .lamp.on { background:var(--alert); box-shadow:0 0 0 6px color-mix(in srgb,var(--alert) 22%,transparent); }
+  .verdict .label { font-size:1.1rem; font-weight:600; }
+  .verdict .p { color:var(--muted); font-size:.88rem; font-family:ui-monospace,monospace; }
+
+  .meter { height:10px; border-radius:99px; background:color-mix(in srgb,var(--text) 10%,transparent); overflow:hidden; margin-top:12px; }
+  .meter span { display:block; height:100%; width:0; background:var(--accent); transition:width .25s; }
+  .scale { display:flex; justify-content:space-between; font-family:ui-monospace,monospace; font-size:.72rem; color:var(--muted); margin-top:4px; }
+
+  canvas { width:100%; height:120px; display:block; border-radius:8px; background:var(--bg); border:1px solid var(--line); }
+  .chromawrap { margin-top:14px; }
+  .caption { font-size:.82rem; color:var(--muted); margin:8px 0 0; }
+  .steps { display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin-top:4px; }
+  .step { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .step b { display:block; font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); margin-bottom:3px; }
+  .step span { font-size:.84rem; color:var(--muted); }
+  code { font-family:ui-monospace,monospace; font-size:.86em; background:color-mix(in srgb,var(--text) 9%,transparent); padding:1px 5px; border-radius:4px; }
+  .note { font-size:.86rem; color:var(--muted); }
+  footer { text-align:center; color:var(--muted); font-size:.83rem; margin-top:28px; }
+  footer a { color:var(--accent); }
+  .err { color:var(--alert); font-size:.88rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Emergency Vehicle Detection</h1>
+    <p class="sub">
+      The trained siren classifier running in your browser.
+      <a href="https://github.com/moralesangel/emergency-vehicle-detection">Source and thesis →</a>
+    </p>
+  </header>
+
+  <section class="panel">
+    <h2>Try it</h2>
+    <div class="controls">
+      <button id="mic">Use microphone</button>
+      <button id="siren" class="ghost">Play a test siren</button>
+      <button id="tone" class="ghost">Play a plain tone</button>
+      <button id="stop" class="ghost" disabled>Stop</button>
+    </div>
+    <p class="note" style="margin:10px 0 0">
+      The microphone never leaves your machine — the model runs locally and nothing is uploaded.
+      The synthetic clips are generated in the page, so you can try it without making noise.
+    </p>
+    <p id="err" class="err"></p>
+
+    <div class="verdict">
+      <div class="lamp" id="lamp"></div>
+      <div>
+        <div class="label" id="label">Idle</div>
+        <div class="p" id="prob">press a button to start</div>
+      </div>
+    </div>
+
+    <div class="meter"><span id="bar"></span></div>
+    <div class="scale"><span>0.0</span><span>0.5 — decision threshold</span><span>1.0</span></div>
+
+    <div class="chromawrap">
+      <canvas id="chroma" width="880" height="120"></canvas>
+      <p class="caption">
+        Live chroma: 12 pitch-class bands over the last 10 seconds. This is the only
+        thing the network ever sees — brighter means more energy in that band.
+      </p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>What happens to the sound</h2>
+    <div class="steps">
+      <div class="step"><b>1 · Capture</b><span>10 s of mono audio at 16 kHz, in a rolling buffer.</span></div>
+      <div class="step"><b>2 · Chroma</b><span>STFT, then a 12-band chroma filterbank → a 12 × 313 map.</span></div>
+      <div class="step"><b>3 · Encode</b><span>A convolutional autoencoder compresses 312 frames to 78.</span></div>
+      <div class="step"><b>4 · Classify</b><span>A four-block CNN outputs one siren probability.</span></div>
+    </div>
+    <p class="note" style="margin-top:14px">
+      The encoder and classifier are the <code>.keras</code> files from the repository, exported to
+      JSON and run with a small forward pass written for this page — same weights, same
+      architecture, no inference library.
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>Honest limits</h2>
+    <p class="note" style="margin-top:0">
+      This is the <code>cnn_chroma</code> model, chosen because it is the smallest; it was
+      the weakest of the nine trained in the thesis, and chroma is a deliberately
+      lossy pitch-class representation. Expect false positives on anything tonal and
+      sweeping — alarms, some music, a kettle. The paper reports full results across
+      MFCC, LFCC and chroma with FFNN, CNN and LSTM heads.
+    </p>
+    <p class="note">
+      One deviation from the Python pipeline: <code>librosa.feature.chroma_stft</code>
+      estimates a tuning offset per signal and shifts its filterbank accordingly. This
+      page ships the untuned filterbank, which moves the output probability by less
+      than 0.01 on test signals. The network itself matches Keras to eight decimals.
+    </p>
+  </section>
+
+  <footer>
+    Runs entirely in your browser. <a href="https://www.researchgate.net/publication/397316148_Neural_Audio_Classification_for_Emergency_Vehicle_Detection_with_Feature_Compression_via_Convolutional_Autoencoders">Read the paper</a>
+  </footer>
+</div>
+
+<script type="module">
+import { chromaStft } from './chroma.js';
+import { predict } from './model.js';
+
+const SR = 16000, WINDOW = SR * 10, PERIOD = 1500;
+const $ = (id) => document.getElementById(id);
+
+let spec = null, fb = null;
+let ctx = null, stream = null, node = null, osc = null;
+let buffer = new Float32Array(WINDOW);
+let filled = 0, timer = null;
+
+const state = (label, prob, on) => {
+  $('label').textContent = label;
+  $('prob').textContent = prob;
+  $('lamp').classList.toggle('on', !!on);
+};
+
+async function loadModel() {
+  const [m, f] = await Promise.all([
+    fetch('./model.json').then((r) => r.json()),
+    fetch('./chroma_fb.json').then((r) => r.json()),
+  ]);
+  spec = m; fb = f.fb;
+}
+
+function pushSamples(data) {
+  const n = data.length;
+  if (n >= WINDOW) {
+    buffer.set(data.subarray(n - WINDOW));
+    filled = WINDOW;
+    return;
+  }
+  buffer.copyWithin(0, n);
+  buffer.set(data, WINDOW - n);
+  filled = Math.min(WINDOW, filled + n);
+}
+
+function drawChroma(ch) {
+  const c = $('chroma'), g = c.getContext('2d');
+  const W = c.width, H = c.height, frames = ch[0].length;
+  const img = g.createImageData(W, H);
+  const rowH = H / 12;
+  for (let y = 0; y < H; y++) {
+    const band = 11 - Math.min(11, Math.floor(y / rowH));
+    for (let x = 0; x < W; x++) {
+      const f = Math.min(frames - 1, Math.floor((x / W) * frames));
+      const v = Math.max(0, Math.min(1, ch[band][f]));
+      const i = (y * W + x) * 4;
+      // Dark blue -> orange ramp, readable in both themes.
+      img.data[i] = Math.round(20 + v * 235);
+      img.data[i + 1] = Math.round(24 + v * 98);
+      img.data[i + 2] = Math.round(38 + v * 22);
+      img.data[i + 3] = 255;
+    }
+  }
+  g.putImageData(img, 0, 0);
+}
+
+function analyse() {
+  if (!spec || filled < SR * 2) return;
+  const y = filled < WINDOW ? buffer.subarray(WINDOW - filled) : buffer;
+  const ch = chromaStft(y, SR, fb);
+  drawChroma(ch);
+  const p = predict(spec, ch);
+  $('bar').style.width = (p * 100).toFixed(1) + '%';
+  state(p > 0.5 ? 'Siren detected' : 'No siren', `p = ${p.toFixed(4)}`, p > 0.5);
+}
+
+function stopAll() {
+  clearInterval(timer); timer = null;
+  if (node) { node.disconnect(); node = null; }
+  if (osc) { try { osc.stop(); } catch {} osc = null; }
+  if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
+  $('stop').disabled = true;
+  $('mic').disabled = false;
+  buffer = new Float32Array(WINDOW); filled = 0;
+  state('Idle', 'stopped', false);
+  $('bar').style.width = '0%';
+}
+
+function startLoop() {
+  clearInterval(timer);
+  timer = setInterval(analyse, PERIOD);
+  $('stop').disabled = false;
+}
+
+async function audioCtx() {
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SR });
+  if (ctx.state === 'suspended') await ctx.resume();
+  return ctx;
+}
+
+/** Feed a MediaStream or generated node through a capture tap. */
+async function capture(sourceNode, ac) {
+  const proc = ac.createScriptProcessor(4096, 1, 1);
+  proc.onaudioprocess = (e) => pushSamples(e.inputBuffer.getChannelData(0));
+  sourceNode.connect(proc);
+  proc.connect(ac.destination);
+  node = proc;
+}
+
+$('mic').addEventListener('click', async () => {
+  $('err').textContent = '';
+  try {
+    const ac = await audioCtx();
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false } });
+    const src = ac.createMediaStreamSource(stream);
+    // Tap the stream without routing the mic to the speakers.
+    const proc = ac.createScriptProcessor(4096, 1, 1);
+    proc.onaudioprocess = (e) => pushSamples(e.inputBuffer.getChannelData(0));
+    src.connect(proc);
+    const mute = ac.createGain(); mute.gain.value = 0;
+    proc.connect(mute); mute.connect(ac.destination);
+    node = proc;
+    $('mic').disabled = true;
+    state('Listening', 'collecting audio…', false);
+    startLoop();
+  } catch (e) {
+    $('err').textContent = 'Could not open the microphone: ' + e.message;
+  }
+});
+
+/** A two-tone siren sweep, the kind the model was trained on. */
+async function playSynth(kind) {
+  $('err').textContent = '';
+  const ac = await audioCtx();
+  stopAll();
+  const o = ac.createOscillator();
+  const g = ac.createGain();
+  g.gain.value = 0.18;
+  o.type = 'sawtooth';
+  const t0 = ac.currentTime;
+  if (kind === 'siren') {
+    o.frequency.setValueAtTime(700, t0);
+    for (let i = 0; i < 40; i++) {
+      o.frequency.linearRampToValueAtTime(i % 2 ? 700 : 1100, t0 + i * 0.6 + 0.6);
+    }
+  } else {
+    o.frequency.setValueAtTime(440, t0);
+  }
+  o.connect(g);
+  const proc = ac.createScriptProcessor(4096, 1, 1);
+  proc.onaudioprocess = (e) => pushSamples(e.inputBuffer.getChannelData(0));
+  g.connect(proc);
+  proc.connect(ac.destination);
+  o.start();
+  osc = o; node = proc;
+  state('Playing ' + (kind === 'siren' ? 'siren' : 'tone'), 'collecting audio…', false);
+  startLoop();
+}
+
+$('siren').addEventListener('click', () => playSynth('siren'));
+$('tone').addEventListener('click', () => playSynth('tone'));
+$('stop').addEventListener('click', stopAll);
+
+loadModel()
+  .then(() => state('Ready', 'model loaded — choose an input', false))
+  .catch(() => { $('err').textContent = 'Could not load the model files.'; });
+</script>
+</body>
+</html>

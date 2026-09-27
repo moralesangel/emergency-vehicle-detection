@@ -6,6 +6,26 @@ This repository contains the BS Thesis focused on automatic detection of emergen
 
 ---
 
+## 📥 Getting the data
+
+The extracted features (`data/*.pkl`, ~430 MB) and the AudioSet
+`unbalanced_train_segments.csv` (~99 MB) are **not committed** — they are
+regenerable, and keeping them in the repository made it slow to clone.
+
+To rebuild them:
+
+1. Download the AudioSet segment CSVs from
+   [research.google.com/audioset](https://research.google.com/audioset/download.html)
+   into `data/csv_files/`.
+2. Download the audio with the notebooks in `src/download_data/`.
+3. Run the notebooks in `src/feature_extraction/` to write `data/mfcc.pkl`,
+   `data/lfcc.pkl` and `data/chroma.pkl`.
+
+The trained models in `models/` **are** committed, so evaluation can be run
+without repeating the training.
+
+---
+
 ## 📂 Project Structure
 ```
 ├─── data # Datos con los que entrenar los modelos

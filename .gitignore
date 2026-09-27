@@ -1,7 +1,16 @@
-data/audios
-__pycache__/
-plots/
-.vercel
+# Extracted features: regenerate with the notebooks in src/feature_extraction/
+data/*.pkl
 
-# Local Netlify folder
-.netlify
+# AudioSet segment lists: download from the AudioSet site (see README)
+data/csv_files/unbalanced_train_segments.csv
+
+# Downloaded audio
+data/audio/
+data/raw/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
